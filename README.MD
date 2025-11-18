@@ -44,6 +44,25 @@ This project implements specific security measures for data protection and monit
 
 -   Logic: Every login attempt triggers an entry in the login_audit database table, recording the username, the action (e.g., "success", "fail (wrong password)"), and the attempt_time.
 
+
+## Installation & Setup Instructions
+
+Follow these steps to set up and run the Express web application:
+
+1. Install dependencies:
+   npm install
+
+
+2. Start the server:
+
+node index.js
+
+
+3. Check your terminal output:
+You should see:
+
+Node server is running on port 8000...
+
 Tech Stack
 ----------
 
