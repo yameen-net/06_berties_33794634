@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Security Audit Log</title>
+    <link rel="stylesheet" type="text/css" href="/main.css" />
+  </head>
+  <body>
+    <h1>Login Audit Trail</h1>
+    <table border="1">
+      <thead>
+        <tr>
+          <th>Username</th>
+          <th>Action</th>
+          <th>Time</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% auditLog.forEach(function(entry) { %>
+          <tr>
+            <td><%= entry.username %></td>
+            <td><%= entry.action %></td>
+            <td><%= entry.attempt_time %></td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </body>
+</html>

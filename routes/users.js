@@ -60,6 +60,16 @@ router.get('/login', function (req, res, next) {
 
 // Task 4: Login 
 router.post('/loggedin', function (req, res, next) {
+
+    const logAudit = (username, action) => {
+        let sqlAudit = "INSERT INTO login_audit (username, action) VALUES (?, ?)";
+        // timestamp is added automatically by the database
+        db.query(sqlAudit, [username, action], (err, result) => {
+            if (err) console.error("Error logging audit:", err);
+        });
+    };
+
+
     // 1. Select the hashed password for the user from the database 
     let sqlquery = "SELECT hashedPassword FROM users WHERE username = ?";
     
@@ -71,6 +81,7 @@ router.post('/loggedin', function (req, res, next) {
         
         // check if any user was found with that username
         if (result.length === 0) {
+            logAudit(req.body.username, "fail (user not found)"); // Log failure
             res.send("User not found. Please check your username.");
             return; 
         }
@@ -85,14 +96,27 @@ router.post('/loggedin', function (req, res, next) {
                 return next(err);
             }
             else if (result == true) {
+                logAudit(req.body.username, "success"); // Log success
                 // Passwords match 
                 res.send("Login successful! Welcome back, " + req.body.username);
             }
             else {
+                logAudit(req.body.username, "fail (wrong password)");
                 // Passwords do not match 
                 res.send("Login failed. Incorrect password.");
             }
         });
+    });
+});
+
+// Task 6: Audit Log Route
+router.get('/audit', function(req, res, next) {
+    let sqlquery = "SELECT * FROM login_audit";
+    db.query(sqlquery, (err, result) => {
+        if (err) {
+            next(err);
+        }
+        res.render("audit.ejs", { auditLog: result });
     });
 });
 
