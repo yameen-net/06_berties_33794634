@@ -3,7 +3,7 @@ const express = require("express")
 
 const redirectLogin = (req, res, next) => {
     if (!req.session.userId ) {
-      res.redirect('..user/login') // redirect to the login page
+      res.redirect('../user/login') // redirect to the login page
     } else { 
         next (); // move to the next middleware function
     } 
