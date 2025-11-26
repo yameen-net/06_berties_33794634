@@ -37,8 +37,8 @@ router.get('/list',redirectLogin, function(req, res, next) {
 
 router.post('/registered', 
     [   check('email').isEmail(),
-        check('username').isLength({ min: 5, max: 20 }).withMessage('Username must be 5-20 chars'),
-        check('password').isLength({ min: 8 }).withMessage('Password must be 8+ chars'),
+        check('username').isLength({ min: 3, max: 20 }).withMessage('Username must be 3-20 chars'),
+        check('password').isLength({ min: 3 }).withMessage('Password must be 3+ chars'),
         check('first').notEmpty().withMessage('First name required'),
         check('last').notEmpty().withMessage('Last name required'),
     ],
