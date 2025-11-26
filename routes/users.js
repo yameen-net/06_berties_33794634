@@ -1,7 +1,20 @@
 // Create a new router
+const { check, validationResult } = require('express-validator');
 const express = require("express")
-const router = express.Router()
+
 const bcrypt = require('bcrypt')
+
+
+
+const redirectLogin = (req, res, next) => {
+    if (!req.session.userId ) {
+      res.redirect('/users/login') // redirect to the login page
+    } else { 
+        next (); // move to the next middleware function
+    } 
+}
+
+const router = express.Router()
 
 
 
@@ -10,7 +23,7 @@ router.get('/register', function (req, res, next) {
 })
 
 // List all users
-router.get('/list', function(req, res, next) {
+router.get('/list',redirectLogin, function(req, res, next) {
     let sqlquery = "SELECT * FROM users"; // Query database to get all the users
     
     db.query(sqlquery, (err, result) => {
@@ -22,36 +35,42 @@ router.get('/list', function(req, res, next) {
     });
 });
 
-router.post('/registered', function (req, res, next) {
-    const saltRounds = 10
-    const plainPassword = req.body.password
-
-    // Hash the password before storing it in the database 
-    bcrypt.hash(plainPassword, saltRounds, function(err, hashedPassword) {
-        if (err) {
-            return next(err);
+router.post('/registered', 
+    [   check('email').isEmail(),
+        check('username').isLength({ min: 5, max: 20 }).withMessage('Username must be 5-20 chars'),
+        check('password').isLength({ min: 8 }).withMessage('Password must be 8+ chars'),
+        check('first').notEmpty().withMessage('First name required'),
+        check('last').notEmpty().withMessage('Last name required'),
+    ],
+    function (req, res, next) {
+        const errors = validationResult(req);
+        
+        
+        if (!errors.isEmpty()) { 
+            // passign the errors to the EJS file 
+            res.render('register.ejs', { errors: errors.array() }); 
         }
+        else {
+           
+            const saltRounds = 10;
+            const plainPassword = req.body.password;
 
-        // Store hashed password in your database 
-        let sqlquery = "INSERT INTO users (username, first_name, last_name, email, hashedPassword) VALUES (?,?,?,?,?)";
-        // Combine form data and the new hashed password
-        let newrecord = [req.body.username, req.body.first, req.body.last, req.body.email, hashedPassword];
+            bcrypt.hash(plainPassword, saltRounds, function(err, hashedPassword) {
+                if (err) return next(err);
 
-        db.query(sqlquery, newrecord, (err, result) => {
-            if (err) {
-                return next(err);
-            }
-            
-            // Prepare the response string 
-            result = 'Hello ' + req.body.first + ' ' + req.body.last + ' you are now registered! We will send an email to you at ' + req.body.email;
-            
-            // Append the debug info as requested in the lab
-            result += ' Your password is: ' + req.body.password + ' and your hashed password is: ' + hashedPassword;
-            
-            res.send(result);
-        });
-    })
-});
+                let sqlquery = "INSERT INTO users (username, first_name, last_name, email, hashedPassword) VALUES (?,?,?,?,?)";
+                let newrecord = [req.body.username, req.sanitize(req.body.first), req.sanitize(req.body.last), req.sanitize(req.body.email), hashedPassword];
+
+                db.query(sqlquery, newrecord, (err, result) => {
+                    if (err) return next(err);
+                   
+                    let resultMsg = 'Hello ' + req.sanitize(req.body.first) + ' ' + req.sanitize(req.body.last) + ' you are now registered!';
+                    res.send(resultMsg);
+                });
+            });
+        }
+    }
+);
 
 // Task 4: Login Page
 router.get('/login', function (req, res, next) {
@@ -97,6 +116,7 @@ router.post('/loggedin', function (req, res, next) {
             }
             else if (result == true) {
                 logAudit(req.body.username, "success"); // Log success
+                req.session.userId = req.body.username;
                 // Passwords match 
                 res.send("Login successful! Welcome back, " + req.body.username);
             }
