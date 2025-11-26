@@ -16,7 +16,7 @@ GRANT ALL PRIVILEGES ON berties_books.* TO 'berties_books_app'@'localhost';
 
 CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(50) NOT NULL,
+    username VARCHAR(50) NOT NULL UNIQUE, 
     first_name VARCHAR(50) NOT NULL,
     last_name VARCHAR(50) NOT NULL,
     email VARCHAR(100) NOT NULL,
@@ -26,8 +26,6 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS login_audit (
     id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) NOT NULL,
-    action VARCHAR(20) NOT NULL,
+    action VARCHAR(255) NOT NULL,          
     attempt_time DATETIME DEFAULT CURRENT_TIMESTAMP
 );
-
-
