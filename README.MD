@@ -45,6 +45,51 @@ This project implements specific security measures for data protection and monit
 -   Logic: Every login attempt triggers an entry in the login_audit database table, recording the username, the action (e.g., "success", "fail (wrong password)"), and the attempt_time.
 
 
+Security Implementations (Lab 8 - Sanitisation & Validation)
+
+Sanitisation 
+
+Goal: Prevent Cross-Site Scripting (XSS) attacks by cleaning user input before processing.
+
+Implementation Details:
+
+Register Form (/registered):
+
+First Name & Last Name: Sanitised using req.sanitize(). These fields are often displayed back to users (e.g., "Hello Henry..."), making them prime targets for XSS scripts like <script>alert('hack')</script>.
+
+Username: Sanitised. Although less commonly used for large scripts, usernames are displayed throughout the site (header, login success messages), so they must be clean.
+
+Email: Sanitised. While emails have strict formats, sanitising them adds a layer of defence against complex injection attempts.
+
+Other Forms:
+
+Add Book (/bookadded): The book name and price are sanitised to prevent stored XSS attacks where a malicious book title could execute code on the book list page for every visitor.
+
+Reasoning for Exclusions:
+
+Passwords: I did not sanitise the password field. Passwords are hashed immediately and never displayed back to the user. Sanitising them might modify special characters (e.g., < or >) that users legitimately use in strong passwords, causing login failures.
+
+Validation
+
+Goal: Ensure data integrity and prevent invalid data from corrupting the database logic.
+
+Implementation Details:
+
+Email: Validated using check('email').isEmail(). Ensures the input follows the standard email format.
+
+Username: Validated using isLength({ min: 5, max: 20 }). Enforces a reasonable length constraint consistent with database limits.
+
+Password: Validated using isLength({ min: 8 }). Enforces a minimum security standard for user accounts.
+
+Required Fields: first and last names are checked with .notEmpty() to prevent incomplete user profiles.
+
+Reasoning:
+
+Validation is applied strictly to the registration form because this is the entry point for user identity.
+
+Validation is not strictly applied to the "Search" bar because an invalid search term (e.g., empty string) simply returns no results rather than breaking the application logic.
+
+
 ## Installation & Setup Instructions
 
 Follow these steps to set up and run the Express web application:
