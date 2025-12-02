@@ -12,6 +12,9 @@ const expressSanitizer = require('express-sanitizer');
 const app = express()
 const port = 8000
 
+
+const apiRouter = require('./routes/api'); 
+
 // Create a session
 app.use(session({
     secret: 'somerandomstuff',
@@ -62,6 +65,13 @@ app.use('/users', usersRoutes)
 // Load the route handlers for /books
 const booksRoutes = require('./routes/books')
 app.use('/books', booksRoutes)
+
+// Load the route handlers for /weather
+const weatherRoutes = require('./routes/weather');
+app.use('/weather', weatherRoutes);
+
+
+app.use('/api', apiRouter);
 
 // Start the web app listening
 app.listen(port, () => console.log(`Example app listening on port ${port}!`))
