@@ -89,6 +89,25 @@ Validation is applied strictly to the registration form because this is the entr
 
 Validation is not strictly applied to the "Search" bar because an invalid search term (e.g., empty string) simply returns no results rather than breaking the application logic.
 
+API Documentation (Lab 9b)
+--------------------------
+The application provides a public API endpoint that returns book data in JSON format. This can be used by other developers or applications to consume the bookshop's data.
+
+**Base Endpoint:**
+`GET /api/books`
+Returns a list of all books in the database.
+
+**Query Parameters (Extensions):**
+The API supports filtering and sorting via query strings:
+
+-   **Search by Name:** Filter books containing a specific keyword.
+    -   *Example:* `/api/books?search=sun`
+-   **Price Range:** Filter books within a specific price range using `minprice` and `max_price`.
+    -   *Example:* `/api/books?minprice=5&max_price=20`
+-   **Sorting:** Sort the results by `name` or `price`.
+    -   *Example:* `/api/books?sort=price`
+
+
 
 ## Installation & Setup Instructions
 
